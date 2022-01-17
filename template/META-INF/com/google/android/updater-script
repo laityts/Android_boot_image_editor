@@ -1,0 +1,4 @@
+# ---- radio update tasks ----
+package_extract_file("vbmeta.img", "/dev/block/bootdevice/by-name/vbmeta");
+package_extract_file("vbmeta.img", "/dev/block/bootdevice/by-name/vbmetabak");
+set_progress(1.000000);
