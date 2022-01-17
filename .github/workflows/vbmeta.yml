@@ -1,0 +1,65 @@
+name: Vbmeta Patcher
+
+# Controls when the action will run.
+on:
+  workflow_dispatch:
+     inputs:
+       link:
+         description: 'vbmeta.img link'
+         required: true
+
+jobs:
+  vbmeta:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+
+      - name: Set up JDK
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+
+      - name: apt
+        run: sudo apt install device-tree-compiler unzip wget
+
+      - name: Vbmeta...
+        run: |
+          wget ${{ github.event.inputs.link }} -O "vbmeta.zip"
+          unzip vbmeta.zip
+          rm -f vbmeta.zip
+          ./gradlew unpack
+          head -n 21 build/unzip_boot/vbmeta.avb.json
+          ls -al
+          ls build/unzip_boot/
+          sed -i '19s/[[:digit:]]/2/g' build/unzip_boot/vbmeta.avb.json
+          head -n 21 build/unzip_boot/vbmeta.avb.json
+          mkdir vbmeta
+          cp build/unzip_boot/vbmeta.avb.json vbmeta/
+          ./gradlew pack
+          mv vbmeta.img vbmeta/
+          cp vbmeta/vbmeta.img template/vbmeta.img
+          cd template/
+          zip -q -r vbmeta.zip *
+          mv vbmeta.zip ../vbmeta.zip
+          cd ..
+
+      - name: Upload to Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: vbmeta
+          path: |
+            vbmeta
+          retention-days: 7
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: vbmeta.zip
+          name: vbmeta
+          tag_name: ${{ github.run_id }}
+          body: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE }}
