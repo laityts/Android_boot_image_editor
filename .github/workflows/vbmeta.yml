@@ -23,7 +23,7 @@ jobs:
           java-version: 11
 
       - name: apt
-        run: sudo apt install device-tree-compiler unzip wget
+        run: sudo apt install device-tree-compiler unzip wget vim
 
       - name: Vbmeta...
         run: |
@@ -31,9 +31,8 @@ jobs:
           unzip vbmeta.zip
           rm -f vbmeta.zip
           ./gradlew unpack
-          rm -rf vbmeta.img
           head -n 21 build/unzip_boot/vbmeta.avb.json
-          ls -al
+          ls
           ls build/unzip_boot/
           sed -i '19s/[[:digit:]]/2/g' build/unzip_boot/vbmeta.avb.json
           head -n 21 build/unzip_boot/vbmeta.avb.json
