@@ -31,6 +31,7 @@ jobs:
           unzip vbmeta.zip
           rm -f vbmeta.zip
           ./gradlew unpack
+          rm -rf vbmeta.img
           head -n 21 build/unzip_boot/vbmeta.avb.json
           ls -al
           ls build/unzip_boot/
@@ -39,7 +40,7 @@ jobs:
           mkdir vbmeta
           cp build/unzip_boot/vbmeta.avb.json vbmeta/
           ./gradlew pack
-          mv vbmeta.img vbmeta/
+          mv vbmeta.img vbmeta/vbmeta.img
           cp vbmeta/vbmeta.img template/vbmeta.img
           cd template/
           zip -q -r vbmeta.zip *
